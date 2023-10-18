@@ -1,0 +1,24 @@
+{
+  "name": "phptictactoe",
+  "version": "1.0.0",
+  "description": "Easy project to learn php",
+  "main": "index.php",
+  "scripts": {
+    "init": "php -S localhost:8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielmoris/php-tictactoe.git"
+  },
+  "keywords": [
+    "php",
+    "project",
+    "learning"
+  ],
+  "author": "Gabriel C. Moris following wfTutorials",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gabrielmoris/php-tictactoe/issues"
+  },
+  "homepage": "https://github.com/gabrielmoris/php-tictactoe#readme"
+}

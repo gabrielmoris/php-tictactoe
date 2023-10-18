@@ -2,3 +2,10 @@
   border-collapse: separate;
   border: 1px solid gray;
 }
+
+.disabled {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+  background-color: red;
+}
