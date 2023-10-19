@@ -1,9 +1,22 @@
 <?php
 
+$last = null;
+$message = "";
 $board = [
   [3, 3, 3],
   [3, 3, 3],
   [3, 3, 3],
+];
+
+$win_conditions = [
+  [[0, 0], [0, 1], [0, 2]],
+  [[1, 0], [1, 1], [1, 2]],
+  [[2, 0], [2, 1], [2, 2]],
+  [[0, 0], [1, 0], [2, 0]],
+  [[0, 1], [1, 1], [2, 1]],
+  [[0, 2], [1, 2], [2, 2]],
+  [[0, 0], [1, 1], [2, 2]],
+  [[0, 2], [1, 1], [2, 0]],
 ];
 
 
@@ -16,21 +29,17 @@ function create_tile($value, $id)
   if ($value == 0) {
     $realValue = "O";
   } else if ($value == 1) {
-    $realValue == "X";
+    $realValue = "X";
   } else {
-    $realValue == "Select";
+    $realValue = "Select";
   }
-
-
   if ($value == 0 || $value == 1) {
-    $o .= "<input type='hidden' name='" . $name . "' value='" . $realValue . "' />";
+    $o .= "<input type='hidden' name='" . $name . "' value='" . $realValue . "'/>";
     $o .= "<select disabled='disabled'>";
   } else {
     $o .= "<select name='" . $name . "'>";
   }
-
   $o .= "<option>Select</option>";
-
   if ($value == 0) {
     $o .= "<option selected='selected'>O</option>";
   } else {
@@ -42,35 +51,91 @@ function create_tile($value, $id)
     $o .= "<option>X</option>";
   }
   $o .= "</select>";
-
   return $o;
 };
 
+function check_winner($conditions, $response)
+{
+
+  $lr = null;
+  $matches = [];
+  for ($j = 0; $j <= count($conditions) - 1; $j++) {
+    foreach ($conditions[$j] as $rows) {
+      $x = $rows[0];
+      $y = $rows[1];
+      if ($response[$x][$y] != 3) {
+        if ($lr == $response[$x][$y] || $lr == null) {
+          $matches[] = $response[$x][$y];
+          $lr = $response[$x][$y];
+        } else {
+          $lr = null;
+          $matches = [];
+          continue;
+        }
+      }
+    }
+    if (count($matches) == 3) {
+      if ($matches[0] == $matches[1] && $matches[0] == $matches[2]) {
+        return true;
+      } else {
+        $matches = [];
+        $lr = null;
+      }
+    } else {
+      $matches = [];
+      $lr = null;
+    }
+    return false;
+  }
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
-  $board = isset($_POST['board']) ? json_encode($_POST['board']) : [];
+  $board = isset($_POST['board']) ? json_decode($_POST['board']) : [];
+  $last = isset($_POST['last']) ? $_POST['last'] : null;
   $responses = [];
   $rowarray = [];
   $counter = 0;
 
   foreach ($_POST as $key => $value) {
-    if (!in_array($key, ["board", "play"])) {
-      if ($key == "O") {
+    if (!in_array($key, ["board", "play", "last"])) {
+      if ($value == 'O') {
+        // echo $value;
         $rowarray[] = 0;
-      } else if ($key == "X") {
+      } else if ($value == 'X') {
         $rowarray[] = 1;
       } else {
         $rowarray[] = 3;
       }
+      $counter++;
+      if ($counter % 3 == 0) {
+        $responses[] = $rowarray;
+        $rowarray = [];
+      }
     }
-    $counter++;
-    if ($counter % 3 == 0) {
-      $responses[] = $rowarray;
-      $rowarray = [];
-    }
-    $board = $responses;
-
-    $changes = [];
   }
+
+  $changes = [];
+
+  for ($i = 0; $i <= count($board) - 1; $i++) {
+    foreach ($board[$i] as $key => $value) {
+      if ($value != $responses[$i][$key]) {
+        $changes[] = $responses[$i][$key];
+      }
+    }
+  }
+
+  if (count($changes) > 1) {
+    $message .= "You can't play twice times in a row.";
+  } else if ($last != null && $last == $changes[0]) {
+    $message .= "You can't play twice times in a row.";
+  } else if (check_winner($win_conditions, $responses)) {
+    $last = $changes[0];
+    $board = $responses;
+    $message .= "The winner is: " . ($last == 0 ? "O" : "X") . "";
+  } else {
+    $last = $changes[0];
+    $board = $responses;
+  };
 }
 ?>
 
@@ -89,6 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
   <br />
   <form method="post">
     <input name="board" type="hidden" value="<?php echo json_encode($board); ?>" />
+    <input name="last" type="hidden" value="<?php echo $last; ?>" />
     <table class="table">
       <?php $count = 1;
       foreach ($board as $row) : ?>
