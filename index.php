@@ -56,7 +56,6 @@ function create_tile($value, $id)
 
 function check_winner($conditions, $response)
 {
-
   $lr = null;
   $matches = [];
   for ($j = 0; $j <= count($conditions) - 1; $j++) {
@@ -75,7 +74,7 @@ function check_winner($conditions, $response)
       }
     }
     if (count($matches) == 3) {
-      if ($matches[0] == $matches[1] && $matches[0] == $matches[2]) {
+      if ($matches[0] == $matches[1] && $matches[1] == $matches[2]) {
         return true;
       } else {
         $matches = [];
@@ -85,8 +84,8 @@ function check_winner($conditions, $response)
       $matches = [];
       $lr = null;
     }
-    return false;
   }
+  return false;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
@@ -131,6 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
   } else if (check_winner($win_conditions, $responses)) {
     $last = $changes[0];
     $board = $responses;
+    $message .= "WINNER!! \n";
     $message .= "The winner is: " . ($last == 0 ? "O" : "X") . "";
   } else {
     $last = $changes[0];
@@ -151,6 +151,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
 
 <body>
   <h3>Tic Tac Toe Game</h3>
+  <br />
+  <?php if ($message) : ?>
+    <p><?php echo $message; ?></p>
+  <?php endif; ?>
   <br />
   <form method="post">
     <input name="board" type="hidden" value="<?php echo json_encode($board); ?>" />
