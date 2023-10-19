@@ -2,6 +2,7 @@
 
 $last = null;
 $message = "";
+$finished = false;
 $board = [
   [3, 3, 3],
   [3, 3, 3],
@@ -20,7 +21,7 @@ $win_conditions = [
 ];
 
 
-function create_tile($value, $id)
+function create_tile($value, $id, $finished)
 {
   $o = "";
   $name = "row_" . $id;
@@ -31,24 +32,24 @@ function create_tile($value, $id)
   } else if ($value == 1) {
     $realValue = "X";
   } else {
-    $realValue = "Select";
+    $realValue = " ";
   }
-  if ($value == 0 || $value == 1) {
+  if ($value == 0 || $value == 1 || $finished) {
     $o .= "<input type='hidden' name='" . $name . "' value='" . $realValue . "'/>";
-    $o .= "<select disabled='disabled'>";
+    $o .= "<select class='disabled' disabled='disabled'>";
   } else {
     $o .= "<select name='" . $name . "'>";
   }
-  $o .= "<option>Select</option>";
+  $o .= "<option> </option>";
   if ($value == 0) {
     $o .= "<option selected='selected'>O</option>";
   } else {
-    $o .= "<option>O</option>";
+    $o .= "<option class='o'>O</option>";
   }
   if ($value == 1) {
     $o .= "<option selected='selected'>X</option>";
   } else {
-    $o .= "<option>X</option>";
+    $o .= "<option class='x'>X</option>";
   }
   $o .= "</select>";
   return $o;
@@ -132,6 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
     $board = $responses;
     $message .= "WINNER!! \n";
     $message .= "The winner is: " . ($last == 0 ? "O" : "X") . "";
+    $finished = true;
   } else {
     $last = $changes[0];
     $board = $responses;
@@ -150,12 +152,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
 </head>
 
 <body>
-  <h3>Tic Tac Toe Game</h3>
-  <br />
+  <h3 class="fancy-title">Tic Tac Toe Game</h3>
   <?php if ($message) : ?>
-    <p><?php echo $message; ?></p>
+    <p class="message"><?php echo $message; ?></p>
   <?php endif; ?>
-  <br />
   <form method="post">
     <input name="board" type="hidden" value="<?php echo json_encode($board); ?>" />
     <input name="last" type="hidden" value="<?php echo $last; ?>" />
@@ -165,14 +165,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
         <tr>
           <?php foreach ($row as $tile) : ?>
             <td>
-              <?php echo create_tile($tile, $count); ?>
+              <?php echo create_tile($tile, $count, $finished); ?>
             </td>
           <?php $count++;
           endforeach; ?>
         </tr>
       <?php endforeach; ?>
     </table>
-    <button name="play">End Turn</button>
+    <div class="btns-wrapper">
+      <button name="restart">Restart</button>
+      <button name="play">End Turn</button>
+    </div>
   </form>
 </body>
 
