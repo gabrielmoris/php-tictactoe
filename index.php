@@ -152,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['play'])) {
 </head>
 
 <body>
-  <h3 class="fancy-title">Tic Tac Toe Game</h3>
+  <h3 class="fancy-title">Tic Tac Toe</h3>
   <?php if ($message) : ?>
     <p class="message"><?php echo $message; ?></p>
   <?php endif; ?>

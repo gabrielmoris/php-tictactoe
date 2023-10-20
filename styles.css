@@ -78,6 +78,14 @@ button[name="restart"]:hover {
   top: 5rem;
 }
 
+select {
+  cursor: pointer;
+}
+
+select:disabled {
+  cursor: no-drop;
+}
+
 select,
 select:active,
 select:focus {
@@ -139,7 +147,7 @@ select {
   top: 0;
   width: 100%;
   height: 100%;
-  animation: changeColors 10s linear infinite;
+  animation: changeColors 30s linear infinite;
   z-index: -1;
 }
 
